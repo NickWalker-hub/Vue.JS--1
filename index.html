@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="css/main.css">
     <title>Product App</title>
-    <script src="js/vue.js"></script>
+    <script defer src="js/vue.js"></script>
     <script defer src="js/main.js"></script>
 </head>
 <body>
@@ -23,11 +23,15 @@
                 <li v-for="detail in details">{{ detail }}</li>
             </ul>
             <div v-for="variant in variants" :key="variant.variantId">
-                <p>{{ variant.variantColor }}</p>
+                <p @click="updateProduct(variant.variantImage)">
+                    {{ variant.variantColor }}
+                </p>
             </div>
-            <ul>
-                <li v-for="size in sizes">{{ size }}</li>
-            </ul>
+            <div class="cart">
+                <p>Cart({{ cart }})</p>
+            </div>
+            <button @click="addToCart">Add to cart</button>
+            <button @click="removeFromCart">Subtraction to cart</button>
         </div>
     </div>
 </div>
