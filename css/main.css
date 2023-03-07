@@ -37,27 +37,31 @@ img {
     width: 40px;
     height: 40px;
     margin-top: 5px;
+    border-radius: 25%;
 }
 
 .cart {
     margin-right: 25px;
     float: right;
     border: 1px solid #d8d8d8;
+    border-radius: 8px;
     padding: 5px 20px;
 }
 
 button {
     margin-top: 30px;
-    border: none;
+    border: double midnightblue;
+    border-radius: 4px;
     background-color: #1E95EA;
     color: white;
     height: 40px;
-    width: 100px;
+    width: 85px;
     font-size: 14px;
 }
 
 .disabledButton {
     background-color: #d8d8d8;
+    border-radius: 4px;
 }
 
 .review-form {
@@ -81,6 +85,10 @@ textarea {
 .tab {
     margin-left: 20px;
     cursor: pointer;
+}
+
+.textLine{
+    text-decoration: line-through;
 }
 
 .activeTab {

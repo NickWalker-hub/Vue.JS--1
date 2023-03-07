@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="css/main.css">
     <title>Product App</title>
-    <script src="js/vue.js"></script>
+    <script defer src="js/vue.js"></script>
     <script defer src="js/main.js"></script>
 </head>
 <body>
@@ -17,17 +17,32 @@
         </div>
         <div class="product-info">
             <h1>{{ product }}</h1>
-            <p v-if="inStock">In stock</p>
-            <p v-else>Out of Stock</p>
+            <p v-if="inStock">😊 In stock 😊</p>
+            <p v-else :class="{ textLine: !inStock}">Out of Stock</p>
             <ul>
                 <li v-for="detail in details">{{ detail }}</li>
             </ul>
-            <div v-for="variant in variants" :key="variant.variantId">
-                <p>{{ variant.variantColor }}</p>
+            <div class="color-box"
+                 v-for="variant in variants"
+                 :key="variant.variantId"
+                 :style="{ backgroundColor:variant.variantColor }"
+                 @click="updateProduct(variant.variantImage)">
             </div>
-            <ul>
-                <li v-for="size in sizes">{{ size }}</li>
-            </ul>
+            <div class="cart">
+                <p>Cart({{ cart }})</p>
+            </div>
+            <button
+                    @click="addToCart"
+                    :disabled="!inStock"
+                    :class="{ disabledButton: !inStock }">
+                Add to cart
+            </button>
+            <button
+                    @click="removeFromCart"
+                    :disabled="!inStock"
+                    :class="{ disabledButton: !inStock }">
+                Remove from cart
+            </button>
         </div>
     </div>
 </div>
