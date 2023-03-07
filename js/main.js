@@ -18,7 +18,7 @@ let app = new Vue({
                 variantImage: "./assets/vmSocks-blue-onWhite.jpg",
             }
         ],
-        cart: 0
+        cart: 0,
     },
     methods: {
         addToCart() {
