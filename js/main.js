@@ -2,11 +2,11 @@ Vue.component('product', {
     props: {
         premium: {
             type: Boolean,
-            required: true
+            required: true,
         }
     },
-template: `
-   <div class="product">
+    template: `
+        <div class="product">
             <div class="product-image">
                 <img :src="image" :alt="altText"/>
             </div>
@@ -14,47 +14,50 @@ template: `
                 <h1>{{ title }}</h1>
                 <p v-if="inStock">In stock</p>
                 <p v-else>Out of Stock</p>
+                <ul>
+                    <li v-for="detail in details">{{ detail }}</li>
+                </ul>
                 <p>Shipping: {{ shipping }}</p>
-                <product-details :details="details"></product-details>
-                <div class="color-box" v-for="(variant, index) in variants" :key="variant.variantId" :style="{ backgroundColor:variant.variantColor }" @click="updateProduct(index)"></div>
-                <button @click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
-                <div class="cart">
-                    <p>Cart({{ cart }})</p>
-                </div>
+                <div class="color-box" v-for="(variant, index) in variants" :key="variant.variantId" :style="{ backgroundColor:variant.variantColor }" @click="UpdateProduct(index)"></div>
+                <button @click="AddToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to Cart</button>
+                <button @click="RemoveFromCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Remove from Cart</button>
             </div>
-   </div>
- `,
+        </div>
+    `,
     data() {
         return {
             product: "Socks",
             brand: 'Vue Mastery',
             selectedVariant: 0,
-            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             altText: "A pair of socks",
+            details: ['80% Cotton', '20% Polyester', 'Gender-neutral'],
             variants: [
                 {
                     variantId: 2234,
                     variantColor: 'green',
-                    variantImage: "./img/vmSocks-green-onWhite.jpg",
+                    variantImage: "./assets/vmSocks-green-onWhite.jpg",
                     variantQuantity: 10
                 },
                 {
                     variantId: 2235,
                     variantColor: 'blue',
-                    variantImage: "./img/vmSocks-blue-onWhite.jpg",
-                    variantQuantity: 0
-                }
+                    variantImage: "./assets/vmSocks-blue-onWhite.jpg",
+                    variantQuantity: 5
+                },
             ],
-            cart: 0
         }
     },
     methods: {
-        addToCart() {
-            this.cart += 1;
+        AddToCart() {
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
         },
-        updateProduct(index) {
+        RemoveFromCart(){
+            this.$emit('remove-from-cart', this.variants[this.selectedVariant].variantId);
+        },
+        UpdateProduct(index){
             this.selectedVariant = index;
-        }
+            console.log(index);
+        },
     },
     computed: {
         title() {
@@ -64,34 +67,33 @@ template: `
             return this.variants[this.selectedVariant].variantImage;
         },
         inStock() {
-            return this.variants[this.selectedVariant].variantQuantity;
+            return this.variants[this.selectedVariant].variantQuantity
         },
         shipping() {
             if (this.premium) {
-                return "Free!";
-            }
-                return 5.98;
+                return "Free";
+            } else {
+                return 2.99;
             }
         }
-    })
-
-Vue.component('product-details', {
-    props: {
-        details: {
-            type: Array,
-            required: true
-        }
-    },
-    template: `
-    <ul>
-        <li v-for="detail in details">{{ detail }}</li>
-    </ul>
-`
+    }
 })
-
 let app = new Vue({
     el: '#app',
     data: {
         premium: true,
+        cart: []
+    },
+    methods: {
+        UpdateCart(id) {
+            this.cart.push(id);
+        },
+        RemoveFromCart(id){
+            for(let i = this.cart.length - 1; i >= 0; --i) {
+                if (this.cart[i] === id) {
+                    this.cart.splice(i, 1);
+                }
+            }
+        }
     }
-});
+})
