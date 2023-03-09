@@ -2,7 +2,7 @@ Vue.component('product', {
     props: {
         premium: {
             type: Boolean,
-            required: true,
+            required: true
         }
     },
     template: `
@@ -19,18 +19,29 @@ Vue.component('product', {
                 </ul>
                 <p>Shipping: {{ shipping }}</p>
                 <div class="color-box" v-for="(variant, index) in variants" :key="variant.variantId" :style="{ backgroundColor:variant.variantColor }" @click="UpdateProduct(index)"></div>
-                <button @click="AddToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to Cart</button>
-                <button @click="RemoveFromCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Remove from Cart</button>
+                <button @click="AddToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
             </div>
+            <div>
+                <h2>Reviews</h2>
+                <p v-if="!reviews.length">There are no reviews yet.</p>
+                <ul v-else>
+                    <li v-for="(review, index) in reviews" :key="index">
+                        <p>{{ review.name }}</p>
+                        <p>Rating:{{ review.rating }}</p>
+                        <p>{{ review.review }}</p>
+                    </li>
+                </ul>
+            </div>
+            <product-review @review-submitted="AddReview"></product-review>
         </div>
-    `,
+ `,
     data() {
         return {
             product: "Socks",
             brand: 'Vue Mastery',
             selectedVariant: 0,
             altText: "A pair of socks",
-            details: ['80% Cotton', '20% Polyester', 'Gender-neutral'],
+            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [
                 {
                     variantId: 2234,
@@ -42,21 +53,22 @@ Vue.component('product', {
                     variantId: 2235,
                     variantColor: 'blue',
                     variantImage: "./assets/vmSocks-blue-onWhite.jpg",
-                    variantQuantity: 5
+                    variantQuantity: 0
                 },
             ],
+            reviews: []
         }
     },
     methods: {
         AddToCart() {
             this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
         },
-        RemoveFromCart(){
-            this.$emit('remove-from-cart', this.variants[this.selectedVariant].variantId);
-        },
-        UpdateProduct(index){
+        UpdateProduct(index) {
             this.selectedVariant = index;
             console.log(index);
+        },
+        AddReview(ProductReview) {
+            this.reviews.push(ProductReview);
         },
     },
     computed: {
@@ -71,13 +83,85 @@ Vue.component('product', {
         },
         shipping() {
             if (this.premium) {
-                return "Free";
+                return "Free!";
             } else {
                 return 2.99;
             }
         }
     }
 })
+
+Vue.component('product-review', {
+    template: `
+    <form class="review-form" @submit.prevent="onSubmit">
+        <p class="error" v-if="errors.length">
+          <b>Please correct the following error(s):</b>
+          <ul>
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </p>
+        <p>
+          <label for="name">Name:</label>
+          <input id="name" v-model="name">
+        </p>
+        <p>
+          <label for="review">Review:</label>      
+          <textarea id="review" v-model="review"></textarea>
+        </p>
+        <p>
+          <label for="rating">Rating:</label>
+          <select id="rating" v-model.number="rating">
+            <option>5</option>
+            <option>4</option>
+            <option>3</option>
+            <option>2</option>
+            <option>1</option>
+          </select>
+        </p> 
+        <p>Would you recommend this product?</p>
+        <label for="recommendation">Yes</label>
+        <input type="radio" value="Yes" v-model="recommendation"/>
+        <label for="recommendation">No</label>
+        <input type="radio" value="No" v-model="recommendation"/>
+        <p>
+          <input type="submit" value="submit">  
+        </p>    
+    </form>
+ `,
+    data() {
+        return {
+            name: null,
+            review: null,
+            rating: null,
+            recommendation: null,
+            errors: []
+        }
+    },
+    methods: {
+        onSubmit() {
+            this.errors = []
+            if(this.name && this.review && this.rating && this.recommendation) {
+                let ProductReview = {
+                    name: this.name,
+                    review: this.review,
+                    rating: this.rating,
+                    recommendation: this.recommendation,
+                }
+                this.$emit('review-submitted', 'product-review')
+                this.name = null
+                this.review = null
+                this.rating = null
+                this.recommendation = null
+            } else {
+                if(!this.name) this.errors.push("Name required.")
+                if(!this.review) this.errors.push("Review required.")
+                if(!this.rating) this.errors.push("Rating required.")
+                if(!this.recommendation) this.errors.push("Recommendation required.")
+            }
+        }
+    }
+})
+
 let app = new Vue({
     el: '#app',
     data: {
@@ -86,14 +170,7 @@ let app = new Vue({
     },
     methods: {
         UpdateCart(id) {
-            this.cart.push(id);
-        },
-        RemoveFromCart(id){
-            for(let i = this.cart.length - 1; i >= 0; --i) {
-                if (this.cart[i] === id) {
-                    this.cart.splice(i, 1);
-                }
-            }
+            this.cart.push(id)
         }
     }
-})
+});
